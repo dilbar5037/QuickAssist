@@ -1,0 +1,9 @@
+//offertitle
+//description
+//email
+//phone
+//shopid
+//shopname
+//createdat
+//status
+//price
