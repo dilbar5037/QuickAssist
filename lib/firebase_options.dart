@@ -46,29 +46,32 @@ class DefaultFirebaseOptions {
     }
   }
 
+  // Updated with your real Firebase project configuration
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCXak3BiuhvvcszPUZ69pI2wPH4EfqWpho',
-    appId: '1:528221720193:web:5f363c1a47e880b5584780',
-    messagingSenderId: '528221720193',
-    projectId: 'quickassist-fd869',
-    authDomain: 'quickassist-fd869.firebaseapp.com',
-    storageBucket: 'quickassist-fd869.appspot.com',
+    apiKey: 'AIzaSyAIAkEkvW0eUR0K-uX3jxwmmaL5cFUM8ME',
+    appId: '1:494241373838:web:5f363c1a47e880b5584780',
+    messagingSenderId: '494241373838',
+    projectId: 'quickassist-97d9a',
+    authDomain: 'quickassist-97d9a.firebaseapp.com',
+    storageBucket: 'quickassist-97d9a.firebasestorage.app',
   );
 
+  // Updated with your real Firebase project configuration
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCgKZiksW-paX9tuMT7iL-P23LY63ahLkk',
-    appId: '1:528221720193:android:c1ea12dbdbdda1dd584780',
-    messagingSenderId: '528221720193',
-    projectId: 'quickassist-fd869',
-    storageBucket: 'quickassist-fd869.appspot.com',
+    apiKey: 'AIzaSyAIAkEkvW0eUR0K-uX3jxwmmaL5cFUM8ME',
+    appId: '1:494241373838:android:c5756ed2e4f6aea50d73df',
+    messagingSenderId: '494241373838',
+    projectId: 'quickassist-97d9a',
+    storageBucket: 'quickassist-97d9a.firebasestorage.app',
   );
 
+  // Updated with your real Firebase project configuration
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDiEOgra3HU0MvxfXGn9qG-lx2EJed5n1o',
-    appId: '1:528221720193:ios:7a1e572e9a7f454c584780',
-    messagingSenderId: '528221720193',
-    projectId: 'quickassist-fd869',
-    storageBucket: 'quickassist-fd869.appspot.com',
-    iosBundleId: 'com.example.quickassitnew',
+    apiKey: 'AIzaSyAIAkEkvW0eUR0K-uX3jxwmmaL5cFUM8ME',
+    appId: '1:494241373838:ios:7a1e572e9a7f454c584780',
+    messagingSenderId: '494241373838',
+    projectId: 'quickassist-97d9a',
+    storageBucket: 'quickassist-97d9a.firebasestorage.app',
+    iosBundleId: 'com.example.quickassistnew',
   );
 }

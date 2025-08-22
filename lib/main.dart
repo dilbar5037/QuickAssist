@@ -7,18 +7,33 @@ import 'package:quickassitnew/constans/colors.dart';
 import 'package:quickassitnew/firebase_options.dart';
 import 'package:quickassitnew/services/location_provider.dart';
 
-void main()async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize('b644b0de-2792-4da5-9df7-a7f71aca8d92');
-  OneSignal.Notifications.requestPermission(true).then((value) {
-    print('signal value: $value');
+  try {
+    // Initialize Firebase with proper error handling
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Firebase initialization error: $e');
+    // Continue with app even if Firebase fails
   }
-  );
+
+  // Initialize OneSignal
+  try {
+    // TODO: Update this with your new OneSignal App ID
+    // OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    // OneSignal.initialize('YOUR_NEW_ONESIGNAL_APP_ID');
+    // OneSignal.Notifications.requestPermission(true).then((value) {
+    //   print('signal value: $value');
+    // });
+    print('OneSignal temporarily disabled - update with your App ID later');
+  } catch (e) {
+    print('OneSignal initialization error: $e');
+  }
+
   runApp(const MyApp());
 }
 

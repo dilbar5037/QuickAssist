@@ -15,44 +15,63 @@ class LocationProvider with ChangeNotifier {
   Placemark? get currentLocationName => _currentLocationName;
 
   Future<void> determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    try {
+      bool serviceEnabled;
+      LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      // Check if location service is enabled
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
-    if (!serviceEnabled) {
-      _currentPosition = null;
-      notifyListeners();
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-
-      if (permission == LocationPermission.denied) {
+      if (!serviceEnabled) {
+        print('Location service is disabled. Please enable location services.');
         _currentPosition = null;
+        _currentLocationName = null;
         notifyListeners();
         return;
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      _currentPosition = null;
+      // Check location permission
+      permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+
+        if (permission == LocationPermission.denied) {
+          print('Location permission denied by user.');
+          _currentPosition = null;
+          _currentLocationName = null;
+          notifyListeners();
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        print('Location permission denied forever. Please enable in settings.');
+        _currentPosition = null;
+        _currentLocationName = null;
+        notifyListeners();
+        return;
+      }
+
+      // Get current position
+      _currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      );
+
+      // Get location name
+      if (_currentPosition != null) {
+        _currentLocationName = await _locationService.getLocationName(_currentPosition);
+        print('Location obtained: ${_currentLocationName?.locality ?? 'Unknown'}');
+      }
+
       notifyListeners();
-      return;
+    } catch (e) {
+      print('Error getting location: $e');
+      _currentPosition = null;
+      _currentLocationName = null;
+      notifyListeners();
     }
-
-    _currentPosition = await Geolocator.getCurrentPosition();
-    //print(_currentPosition);
-
-    _currentLocationName =
-    await _locationService.getLocationName(_currentPosition);
-
-    print(_currentLocationName);
-
-    notifyListeners();
   }
 
 // ask the permission
