@@ -1,3 +1,18 @@
+/*
+ * QuickAssist - Vehicle Service Booking App
+ * 
+ * Project Status: Firebase Integration Complete ✅
+ * - Authentication: Working
+ * - Database: Connected  
+ * - Location: Permissions Added
+ * - Storage: Ready for Blaze Plan Upgrade
+ * 
+ * Next Phase: Image Uploads and Storage Features
+ * 
+ * Developer: Dilbar Suhood M
+ * Last Updated: August 2025
+ */
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
