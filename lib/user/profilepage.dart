@@ -64,6 +64,19 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final themedata=Theme.of(context);
+
+    ImageProvider<Object> _buildProfileImageProvider() {
+      if (img == null || img!.isEmpty) {
+        return const AssetImage('assets/img/profile.png');
+      }
+      final uri = Uri.tryParse(img!);
+      final isRemote = uri != null && (uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https'));
+      if (isRemote) {
+        return NetworkImage(img!);
+      }
+      // Fallback to bundled asset if the stored value is a local asset path
+      return const AssetImage('assets/img/profile.png');
+    }
     return Scaffold( backgroundColor: AppColors.scaffoldColor,
       body: SafeArea(
         child: Column(
@@ -81,9 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.blueAccent,
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: img != null
-                          ? NetworkImage(img!)
-                          : AssetImage('assets/img/profile.png') as ImageProvider<Object>,
+                      image: _buildProfileImageProvider(),
                       fit: BoxFit.cover, // You can adjust the BoxFit as needed
                     ),
                   ),

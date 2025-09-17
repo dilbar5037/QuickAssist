@@ -53,7 +53,10 @@ class Invoice {
         amount: data['amount'] as double,
         issueDate: (data['issueDate'] as Timestamp).toDate(),
         dueDate: (data['dueDate'] as Timestamp).toDate(),
-        status: InvoiceStatus.values.firstWhere((e) => e.toString() == 'InvoiceStatus.${data['status']}'),
+        status: InvoiceStatus.values.firstWhere(
+          (e) => e.toString() == 'InvoiceStatus.${data['status']}',
+          orElse: () => InvoiceStatus.Pending, // Default to Pending if no match found
+        ),
         transactions: transactionsList
     );
   }

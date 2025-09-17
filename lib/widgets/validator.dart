@@ -1,67 +1,70 @@
-class Validate
-{
-  static String? Textvalidator(String value)
-  {
-    if(value.length<2)
+class Validate {
+  static String? Textvalidator(String value) {
+    final trimmed = value.trim();
+    if (trimmed.length < 2) {
       return 'REQUIRED FIELD';
-    else
-      return null;
+    }
+    return null;
   }
-  static String? check(String value)
-  {
-    if(value.isEmpty==true)
+
+  static String? check(String value) {
+    if (value.trim().isEmpty) {
       return 'REQUIRED FIELD';
-    else
-      return null;
+    }
+    return null;
   }
-  static String? GenderValidator(String value)
-  {
-    if(num.parse(value)==null)
+
+  static String? GenderValidator(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty || trimmed.toLowerCase() == 'select gender') {
       return 'REQUIRED FIELD';
-    else
-      return null;
+    }
+    return null;
   }
-  static String? pwdvalidator(String value)
-  {
-    if(value.length<8) {
-      return('PASSWORD SHOULD CONTAIN ATLEAST 8 CHARACTERS');
-    } else
-      return null;
+
+  static String? pwdvalidator(String value) {
+    if (value.length < 8) {
+      return 'PASSWORD SHOULD CONTAIN ATLEAST 8 CHARACTERS';
+    }
+    return null;
   }
-  static String? confirmvalidator(String value,String password)
-  {
-    if(value!=password )
+
+  static String? confirmvalidator(String value, String password) {
+    if (value != password) {
       return 'PASSWORD MISSMATCH ';
-    else
-      return null;
+    }
+    return null;
   }
-  static String? phnvalidator(String value)
-  {
-    if(value.length!=10 || num.parse(value)==null)
-      return'INVALID PHONE NUMBER';
-    else
-      return null;
+
+  static String? phnvalidator(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return 'REQUIRED FIELD';
+    }
+    if (!RegExp(r'^\d{10}$').hasMatch(trimmed)) {
+      return 'INVALID PHONE NUMBER';
+    }
+    return null;
   }
-  static String? pinvalidator(String value)
-  {
-    if(value.length!=6 || num.parse(value)==null)
-      return'NUMBER MUST BE 6 DIGIT';
-    else
-      return null;
+
+  static String? pinvalidator(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return 'REQUIRED FIELD';
+    }
+    if (!RegExp(r'^\d{6}$').hasMatch(trimmed)) {
+      return 'NUMBER MUST BE 6 DIGIT';
+    }
+    return null;
   }
-  static String? emailValidator(String value) //Email Validation
-  {
-    var pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value))
-    {
+
+  static String? emailValidator(String value) {
+    const pattern =
+        r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    final regex = RegExp(pattern);
+    if (!regex.hasMatch(value)) {
       return 'Email format is invalid';
     }
-    else
-    {
-      return null;
-    }
-   }
-
+    return null;
+  }
 }

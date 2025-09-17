@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -78,85 +78,73 @@ class _CheckoutPageState extends State<CheckoutPage> {
     showAlertDialog(context, "Payment Failed", "Code: ${response.code}\nDescription: ${response.message}\nMetadata:${response.error.toString()}");
   }
 
-  void handlePaymentSuccessResponse(PaymentSuccessResponse response) {
- print("Hello this is from jobin");
-    /** Payment Success Response contains three values:
-     * 1. Order ID
-     * 2. Payment ID
-     * 3. Signature
-     **/
-
-    if(response.paymentId!=null){
-
-
- print("helo jobinfee collected");
-
-
-
-
-
-      try {
-
-        // Open the generated PDF file
-      collectFee(widget.customerData,widget.booking,response.paymentId);
-        
-
-        
-      } catch (e) {
-        print(
-            'Failed to collect fee: $e');
-      }
+  void handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
+    print("Hello this is from jobin");
+    if (response.paymentId == null) {
+      return;
     }
 
+    print("helo jobinfee collected");
 
-
-
-
-
-
-    //showAlertDialog(context, "Payment Successful", "Payment ID: ${response.paymentId}");
+    try {
+      await collectFee(widget.customerData, widget.booking, response.paymentId);
+    } catch (e) {
+      print('Failed to collect fee: $e');
+    }
   }
 
-  collectFee(UserModel? user, var booking,String? id)async {
-    var id = Uuid().v1();
-    id = id;
-// Replace these values with the actual student and fee amount.
-    // Specify the fee amount to collect.
+  Future<void> collectFee(UserModel? user, dynamic booking, String? paymentId) async {
+    if (user == null) {
+      throw StateError('User details missing for fee collection');
+    }
+    if (paymentId == null || paymentId.isEmpty) {
+      throw StateError('Payment id missing');
+    }
 
-    FirebaseFirestore.instance.collection('payment').doc(id).set(
+    Map<String, dynamic> bookingData;
+    if (booking is Map<String, dynamic>) {
+      bookingData = Map<String, dynamic>.from(booking);
+    } else if (booking is Map) {
+      bookingData = Map<String, dynamic>.from(booking as Map);
+    } else {
+      throw StateError('Unsupported booking data type: ${booking.runtimeType}');
+    }
 
-        {
-          'userId': user!.uid,
-          'username': user!.name,
-          'useremail': user!.email,
-          'userphone': user!.phone,
-          'shopid': booking['shopid'],
-          'bookingprice': booking['offerPrice'],
-          'status': 1,
-          'createdAt': DateTime.now(),
-          'paymentId': id
-        }
+    final bookingId = bookingData['bookingId'] ?? bookingData['bookingid'];
+    if (bookingId == null) {
+      throw StateError('Booking id missing in booking data');
+    }
 
+    final paymentDocumentId = Uuid().v1();
 
-    ).then((value) {
-      FirebaseFirestore.instance.collection('bookings').doc(
-          booking['bookingId']).update(
-
-          {
-            'paymentstatus': 1,
-            'status': "Completed"
-          }
-      ).then((value) =>
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (context) => BottomNavigationPage()), (
-                  route) => false));
+    await FirebaseFirestore.instance.collection('payment').doc(paymentDocumentId).set({
+      'userId': user.uid,
+      'username': user.name,
+      'useremail': user.email,
+      'userphone': user.phone,
+      'shopid': bookingData['shopid'],
+      'bookingprice': bookingData['offerPrice'],
+      'status': 1,
+      'createdAt': DateTime.now(),
+      'paymentId': paymentId,
+      'paymentDocId': paymentDocumentId,
     });
-    // Generate the PDF invoice
 
+    await FirebaseFirestore.instance.collection('bookings').doc(bookingId).update({
+      'paymentstatus': 1,
+      'status': 'Completed',
+    });
 
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const BottomNavigationPage()),
+      (route) => false,
+    );
   }
-
-
 
   // randomnumber
 
@@ -251,7 +239,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Subtotal: \$${widget.booking['offerPrice']}',
+                  'Subtotal: ₹${widget.booking['offerPrice']}',
                    textAlign: TextAlign.right,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
                 ),
@@ -265,7 +253,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Estimated Tax (18%): \$${estimatedTax.toStringAsFixed(2)}',
+                  'Estimated Tax (18%): ₹${estimatedTax.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 16,color: Colors.white),
                 ),
               ],
@@ -278,7 +266,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Total: \$${total.toStringAsFixed(2)}',
+                  'Total: ₹${total.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
                 ),
               ],
@@ -309,3 +297,5 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 }
+
+

@@ -1,5 +1,6 @@
 
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,60 +17,65 @@ class LocationProvider with ChangeNotifier {
 
   Future<void> determinePosition() async {
     try {
-      bool serviceEnabled;
-      LocationPermission permission;
-
-      // Check if location service is enabled
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('Location service is disabled. Please enable location services.');
-        _currentPosition = null;
-        _currentLocationName = null;
+        print('Location service is disabled. Falling back to last known position.');
+        _currentPosition = await Geolocator.getLastKnownPosition();
+        _currentLocationName = await _locationService.getLocationName(_currentPosition);
         notifyListeners();
         return;
       }
 
-      // Check location permission
-      permission = await Geolocator.checkPermission();
-
+      var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-
         if (permission == LocationPermission.denied) {
-          print('Location permission denied by user.');
-          _currentPosition = null;
-          _currentLocationName = null;
+          print('Location permission denied by user. Falling back to last known.');
+          _currentPosition = await Geolocator.getLastKnownPosition();
+          _currentLocationName = await _locationService.getLocationName(_currentPosition);
           notifyListeners();
           return;
         }
       }
-
       if (permission == LocationPermission.deniedForever) {
-        print('Location permission denied forever. Please enable in settings.');
-        _currentPosition = null;
-        _currentLocationName = null;
+        print('Location permission denied forever. Falling back to last known.');
+        _currentPosition = await Geolocator.getLastKnownPosition();
+        _currentLocationName = await _locationService.getLocationName(_currentPosition);
         notifyListeners();
         return;
       }
 
-      // Get current position
-      _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 10),
+      // 1) Quick fallback for instant UI update (may be stale)
+      _currentPosition = await Geolocator.getLastKnownPosition();
+
+      // 2) Try fresh fix with longer timeout and high accuracy
+      const settings = LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 25),
       );
 
-      // Get location name
+      try {
+        final fresh = await Geolocator.getCurrentPosition(locationSettings: settings);
+        _currentPosition = fresh;
+      } on TimeoutException {
+        print('getCurrentPosition timed out; using last known position if available.');
+      } catch (e) {
+        print('getCurrentPosition error: $e');
+      }
+
       if (_currentPosition != null) {
         _currentLocationName = await _locationService.getLocationName(_currentPosition);
-        print('Location obtained: ${_currentLocationName?.locality ?? 'Unknown'}');
+        print('Location obtained: ${_currentLocationName?.locality ?? 'Unknown'} '
+            '(${_currentPosition!.latitude}, ${_currentPosition!.longitude})');
+      } else {
+        _currentLocationName = null;
       }
 
       notifyListeners();
     } catch (e) {
       print('Error getting location: $e');
-      _currentPosition = null;
-      _currentLocationName = null;
+      _currentPosition = await Geolocator.getLastKnownPosition();
+      _currentLocationName = await _locationService.getLocationName(_currentPosition);
       notifyListeners();
     }
   }

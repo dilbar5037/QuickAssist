@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:quickassitnew/constans/colors.dart';
 
 class ContactUsScreen extends StatelessWidget {
@@ -31,7 +32,7 @@ class ContactUsScreen extends StatelessWidget {
             _buildContactInfo(
               "Visit our office:",
               Icons.location_on,
-                  () {
+                  () async {
                 // Add logic to open a map or provide office address
               },
             ),
@@ -45,11 +46,11 @@ class ContactUsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactInfo(String text, IconData icon, VoidCallback onPressed) {
+  Widget _buildContactInfo(String text, IconData icon, Future<void> Function() onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: InkWell(
-        onTap: onPressed,
+        onTap: () => onPressed(),
         child: Row(
           children: [
             Icon(
@@ -58,9 +59,11 @@ class ContactUsScreen extends StatelessWidget {
               color: Colors.blue,
             ),
             SizedBox(width: 16),
-            Text(
-              text,
-              style: TextStyle(fontSize: 16),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 16),
+              ),
             ),
           ],
         ),
@@ -78,13 +81,23 @@ class ContactUsScreen extends StatelessWidget {
     );
   }
 
-  void _launchEmail(String email) {
-    // Add logic to launch the email app with the given email
+  Future<void> _launchEmail(String email) async {
+    final uri = Uri(scheme: 'mailto', path: email);
+    await _launchUri(uri);
   }
 
-  void _launchPhone(String phoneNumber) {
-    // Add logic to launch the phone app with the given phone number
+  Future<void> _launchPhone(String phoneNumber) async {
+    final uri = Uri(scheme: 'tel', path: phoneNumber);
+    await _launchUri(uri);
+  }
+
+  Future<void> _launchUri(Uri uri) async {
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched) {
+      debugPrint('Could not launch $uri');
+    }
   }
 }
+
 
 

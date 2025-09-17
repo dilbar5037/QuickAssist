@@ -85,17 +85,19 @@ class _ShopListState extends State<ShopList> {
               ),
               Expanded(
                 child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
+                  stream: (() {
+                    final String qType = (widget.selectionData ?? '').trim().toLowerCase();
+                    final String qCity = (_locationController.text.isNotEmpty
+                        ? _locationController.text
+                        : (widget.city ?? '')).trim().toLowerCase();
+                    print('Query typeLower: ' + qType + ', cityLower: ' + qCity);
+                    return FirebaseFirestore.instance
                       .collection('services')
                       .where('status', isEqualTo: 1)
-                      .where('type', isEqualTo: widget.selectionData)
-                      .where(
-                    'shopLocation',
-                    whereIn: [
-                      _locationController.text.toLowerCase(),
-                      widget.city?.toLowerCase()
-                    ],
-                  ).snapshots(),
+                      .where('typeLower', isEqualTo: qType)
+                      .where('shopLocationLower', isEqualTo: qCity)
+                      .snapshots();
+                  })(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
                           snapshot) {

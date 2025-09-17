@@ -31,14 +31,15 @@ class _AdminHomePageState extends State<AdminHomePage> {
   String? email;
   String? phone;
 
-  getData() async {
-    SharedPreferences _pref = await SharedPreferences.getInstance();
-    _type = await _pref.getString('type');
-    email = await _pref.getString('email');
-    name = await _pref.getString('name');
-    phone = await _pref.getString('phone');
-    uid = await _pref.getString('uid');
+  Future<void> getData() async {
+    final prefs = await SharedPreferences.getInstance();
+    _type = prefs.getString('type');
+    email = prefs.getString('email');
+    name = prefs.getString('name');
+    phone = prefs.getString('phone');
+    uid = prefs.getString('uid');
 
+    if (!mounted) return;
     setState(() {});
   }
 

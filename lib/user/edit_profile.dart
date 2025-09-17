@@ -9,6 +9,7 @@ import 'package:quickassitnew/constans/colors.dart';
 import 'package:quickassitnew/widgets/appbutton.dart';
 import 'package:quickassitnew/widgets/customtextformfiled.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class Editprofilepage extends StatefulWidget {
   const Editprofilepage({super.key});
 
@@ -17,86 +18,82 @@ class Editprofilepage extends StatefulWidget {
 }
 
 class _EditprofilepageState extends State<Editprofilepage> {
-  TextEditingController _nameController=TextEditingController();
-  TextEditingController _phoneController=TextEditingController();
-  TextEditingController _locationController=TextEditingController();
-  TextEditingController _addressController=TextEditingController();
-  final _key=GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final _key = GlobalKey<FormState>();
 
   String? _type;
-
-  String?uid;
-
-  String?name;
-
-  String?email;
-
-  String?phone;
-  String?address;
-  String?location;
-  String?img;
+  String? uid;
+  String? name;
+  String? email;
+  String? phone;
+  String? address;
+  String? location;
+  String? img;
 
   getData() async {
-    SharedPreferences _pref = await SharedPreferences.getInstance();
-    _type = await _pref.getString('type');
-    email= await _pref.getString('email');
-    name = await _pref.getString('name');
-    phone = await _pref.getString('phone');
-    uid = await _pref.getString('uid');
-    img = await _pref.getString('imgurl');
-    address = await _pref.getString('address');
-    location = await _pref.getString('location');
+    final _pref = await SharedPreferences.getInstance();
+    _type = _pref.getString('type');
+    email = _pref.getString('email');
+    name = _pref.getString('name');
+    phone = _pref.getString('phone');
+    uid = _pref.getString('uid');
+    img = _pref.getString('imgurl');
+    address = _pref.getString('address');
+    location = _pref.getString('location');
 
-    _phoneController.text=phone!;
-    _nameController.text=name!;
-
-    if(location!=null){
-      _locationController.text=location!;
-
-    }
-    if(address!=null){
-      _addressController.text=address!;
-    }
+    if (phone != null) _phoneController.text = phone!;
+    if (name != null) _nameController.text = name!;
+    if (location != null) _locationController.text = location!;
+    if (address != null) _addressController.text = address!;
     setState(() {});
   }
 
   var locationCity;
-  var filename;
+  String? filename;
   XFile? image;
-  var url;
-  final ImagePicker _picker=ImagePicker();
+  String? url;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     getData();
-
-
-
-
-
-
-
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    final themedata=Theme.of(context);
+    final themedata = Theme.of(context);
+
+    ImageProvider<Object> _buildProfileImageProvider() {
+      if (img == null || img!.isEmpty) {
+        return const AssetImage('assets/img/profile.png');
+      }
+      final uri = Uri.tryParse(img!);
+      final isRemote = uri != null && uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+      if (isRemote) {
+        return NetworkImage(img!);
+      }
+      return const AssetImage('assets/img/profile.png');
+    }
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: AppBar(
         backgroundColor: AppColors.scaffoldColor,
-        title:  Text("Edit Profile",style: themedata.textTheme.displaySmall,),
+        title: Text('Edit Profile', style: themedata.textTheme.displaySmall),
       ),
       body: Container(
         height: double.infinity,
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _key,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Center(
                   child: SizedBox(
                     height: 240,
@@ -107,180 +104,177 @@ class _EditprofilepageState extends State<Editprofilepage> {
                         color: Colors.blueAccent,
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: img != null
-                              ? NetworkImage(img!)
-                              : AssetImage('assets/img/profile.png') as ImageProvider<Object>,
-                          fit: BoxFit.cover, // You can adjust the BoxFit as needed
+                          image: _buildProfileImageProvider(),
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
                 ),
-                Text("Name"),
-                CustomTextFormField(controller: _nameController, hintText: "Name",validator: (value){
-                  if(value!.isEmpty){
-                    return "Enter a valid name";
-                  }
-                },),
-                Text("Phone"),
-                CustomTextFormField(controller: _phoneController, hintText: "Phone",validator: (value){
-                  if(value!.isEmpty){
-                    return "Enter a valid name";
-                  }
-                }),
-                Text("Location"),
-                CustomTextFormField(controller: _locationController, hintText: "Location",validator: (value){
-                  if(value!.isEmpty){
-                    return "Enter a valid Location";
-                  }
-                }),
-                Text("Address"),
-                CustomTextFormField(controller: _addressController, hintText: "Address",validator: (value){
-                  if(value!.isEmpty){
-                    return "Enter  valid Address";
-                  }
-                }),
-                SizedBox(height: 20,),
-
-
-
+                const Text('Name'),
+                CustomTextFormField(
+                  controller: _nameController,
+                  hintText: 'Name',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Enter a valid name';
+                    return null;
+                  },
+                ),
+                const Text('Phone'),
+                CustomTextFormField(
+                  controller: _phoneController,
+                  hintText: 'Phone',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Enter a valid name';
+                    return null;
+                  },
+                ),
+                const Text('Location'),
+                CustomTextFormField(
+                  controller: _locationController,
+                  hintText: 'Location',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Enter a valid Location';
+                    return null;
+                  },
+                ),
+                const Text('Address'),
+                CustomTextFormField(
+                  controller: _addressController,
+                  hintText: 'Address',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Enter  valid Address';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
                 Center(
                   child: GestureDetector(
-                    onTap:(){
+                    onTap: () {
                       showimagepicker();
-
                     },
                     child: Container(
-                        height:100,
-                        width:100,
-                        decoration: BoxDecoration(
-                            color: Colors.blueAccent,
-                            shape: BoxShape.circle
-                        ),
-                        child:image!=null? Image.file(File(image!.path)):
-                        Container(
-
-                          child: Icon(Icons.camera_alt,size:20,color:Colors.grey,),
-                        )
-
+                      height: 100,
+                      width: 100,
+                      decoration: const BoxDecoration(
+                        color: Colors.blueAccent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: image != null
+                          ? Image.file(File(image!.path))
+                          : const Icon(Icons.camera_alt, size: 20, color: Colors.grey),
                     ),
                   ),
                 ),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20),
+                AppButton(
+                  onTap: () async {
+                    if (!(_key.currentState?.validate() ?? false)) return;
 
-                AppButton(onTap: (){
+                    String? newUrl;
+                    if (image != null) {
+                      final fileName = filename ?? 'profile_${uid ?? 'user'}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+                      final ref = FirebaseStorage.instance.ref().child('profile/$fileName');
+                      final utask = ref.putFile(File(image!.path));
+                      await utask;
+                      newUrl = await ref.getDownloadURL();
+                    }
 
-
-                  var ref=FirebaseStorage.instance.ref().child('profile/$filename');
-                  UploadTask utask=ref.putFile(File(image!.path));
-                  utask.then((res)async{
-                    url=(await ref.getDownloadURL()).toString();
-                  }).then((value){
-                    FirebaseFirestore.instance.collection('users').doc(uid).update({
-
-                      'imgurl': url??img,
+                    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+                      'imgurl': newUrl ?? img,
                       'status': 1,
-                      "location":_locationController.text,
-                      "address":_addressController.text,
-                      "phone":_phoneController.text,
-                      "name":_nameController.text,
+                      'location': _locationController.text,
+                      'address': _addressController.text,
+                      'phone': _phoneController.text,
+                      'name': _nameController.text,
+                    });
 
+                    final _pref = await SharedPreferences.getInstance();
+                    _pref.setString('name', _nameController.text);
+                    _pref.setString('phone', _phoneController.text);
+                    _pref.setString('address', _addressController.text);
+                    _pref.setString('location', _locationController.text);
+                    if (newUrl != null) {
+                      _pref.setString('imgurl', newUrl);
+                      img = newUrl;
+                    }
 
-
-
-                    }).then((value) async{
-
-                      SharedPreferences _pref=await SharedPreferences.getInstance();
-
-
-                      _pref.setString('name', _nameController.text);
-                      _pref.setString('phone', _phoneController.text);
-                      _pref.setString('address', _addressController.text);
-                      _pref.setString('location', _locationController.text);
-                      _pref.setString('imgurl', url);
-
-
-
-
-
-
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Updated")));
-                      Navigator.pop(context);
-                    });// common code for data saving,updating
-
-                  } );
-
-
-
-                }, child: Text("Update",style: TextStyle(color: Colors.white),),height: 52,color: AppColors.contColor5,)
-
-
-
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Updated')));
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Update', style: TextStyle(color: Colors.white)),
+                  height: 52,
+                  color: AppColors.contColor5,
+                ),
               ],
             ),
           ),
         ),
       ),
-
     );
   }
-  imageFromgallery()async{
+
+  imageFromgallery() async {
     final XFile? _image = await _picker.pickImage(source: ImageSource.gallery);
-    setState((){
-      image=_image;
+    if (_image != null) {
+      setState(() {
+        image = _image;
+        filename = 'gallery_${uid ?? 'user'}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      });
     }
-
-    );
-
   }
-  imageFromcamera()async{
+
+  imageFromcamera() async {
     final XFile? _image = await _picker.pickImage(source: ImageSource.camera);
-    setState((){
-      image=_image;
+    if (_image != null) {
+      setState(() {
+        image = _image;
+        filename = 'camera_${uid ?? 'user'}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      });
     }
-
-    );
-
   }
-  showimagepicker(){
-    showModalBottomSheet(context: context,
-        builder: (context){
-          return Container(
-            height: 80,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                InkWell(
-                  child: Row(
-                    children: [
-                      Text("Gallery"),
-                      Icon(Icons.photo),
-                    ],
-                  ),
-                  onTap: (){
-                    imageFromgallery();
-                  },
 
+  showimagepicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SizedBox(
+          height: 80,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              InkWell(
+                child: const Row(
+                  children: [
+                    Text('Gallery'),
+                    Icon(Icons.photo),
+                  ],
                 ),
-                SizedBox(width: 20,),
-                InkWell(
-                  child:Row(
-                    children: [
-                      Text("Camera"),
-                      Icon(Icons.camera),
-                    ],
-                  ),
-                  onTap: (){
-                    imageFromcamera();
-                  },
-
+                onTap: () {
+                  Navigator.pop(context);
+                  imageFromgallery();
+                },
+              ),
+              const SizedBox(width: 20),
+              InkWell(
+                child: const Row(
+                  children: [
+                    Text('Camera'),
+                    Icon(Icons.camera),
+                  ],
                 ),
-              ],
-
-            ),
-          );
-        }
+                onTap: () {
+                  Navigator.pop(context);
+                  imageFromcamera();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
+

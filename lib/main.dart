@@ -13,7 +13,9 @@
  * Last Updated: August 2025
  */
 
+import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -21,8 +23,10 @@ import 'package:quickassitnew/common/splash_page.dart';
 import 'package:quickassitnew/constans/colors.dart';
 import 'package:quickassitnew/firebase_options.dart';
 import 'package:quickassitnew/services/location_provider.dart';
+import 'package:quickassitnew/admin/addons_backfill_normalize.dart';
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
@@ -31,6 +35,28 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print('Firebase initialized successfully');
+    // Enable App Check in debug mode to silence placeholder token warnings
+    try {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      );
+      print('Firebase App Check activated (debug providers).');
+    } catch (e) {
+      print('App Check activation skipped: $e');
+    }
+
+    // Fire-and-forget normalization so startup is never blocked by network
+    () async {
+      try {
+        await BackfillNormalizer
+            .normalizeServices()
+            .timeout(const Duration(seconds: 5));
+        print('Backfill normalization completed');
+      } catch (e) {
+        print('Backfill normalization skipped: $e');
+      }
+    }();
   } catch (e) {
     print('Firebase initialization error: $e');
     // Continue with app even if Firebase fails
@@ -84,5 +110,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 

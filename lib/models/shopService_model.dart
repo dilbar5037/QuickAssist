@@ -49,13 +49,15 @@ class Service {
       'title': title,
       'desc': description,
       'type': type,
+      'typeLower': (type ?? '').toString().trim().toLowerCase(),
       'price': price,
       'offer': offer,
       'status': status,
       'shopid': shopId,
       'shopemail':shopEmail,
       'shopPhone':shopPhone,
-    'shopLocation':shopLocation
+    'shopLocation':shopLocation,
+    'shopLocationLower': (shopLocation ?? '').toString().trim().toLowerCase()
     };
   }
 }

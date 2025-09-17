@@ -321,7 +321,10 @@ class _LoginPageState extends State<LoginPage> {
               _pref.setString('type', "user");
               _pref.setString('location', "location");
               _pref.setString('imgurl', "assets/img/profile.png");
-              _pref.setString('token', userCredential.user!.getIdToken().toString());
+              final token = await userCredential.user!.getIdToken();
+              if (token != null) {
+                _pref.setString('token', token);
+              }
 
               Navigator.pushAndRemoveUntil(
                 context,
@@ -350,8 +353,14 @@ class _LoginPageState extends State<LoginPage> {
               _pref.setString('egst', snap['gst']);
 
               _pref.setString('type', "shop");
-              _pref.setString('location', "location");
-              _pref.setString('token', userCredential.user!.getIdToken().toString());
+              // Save the actual shop location from Firestore
+              if (snap.data().toString().contains('location')) {
+                _pref.setString('location', (snap['location'] ?? '').toString());
+              }
+              final token = await userCredential.user!.getIdToken();
+              if (token != null) {
+                _pref.setString('token', token);
+              }
 
               Navigator.pushAndRemoveUntil(
                 context,
@@ -383,7 +392,10 @@ class _LoginPageState extends State<LoginPage> {
 
              // _pref.setString('type', "shop");
               _pref.setString('location', "location");
-              _pref.setString('token', userCredential.user!.getIdToken().toString());
+              final token = await userCredential.user!.getIdToken();
+              if (token != null) {
+                _pref.setString('token', token);
+              }
 
               Navigator.pushAndRemoveUntil(
                 context,

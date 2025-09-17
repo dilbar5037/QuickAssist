@@ -53,20 +53,20 @@ final scaffoldKey=GlobalKey<ScaffoldState>();
           toolbarHeight: 20,
 
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.contColor5,
-          onPressed: () {
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => Addpage(data: widget.data,)),
-            // );
-          },
-          child: Icon(
-            Icons.add,
-            color:Colors.white,
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        // floatingActionButton: FloatingActionButton(
+        //   backgroundColor: AppColors.contColor5,
+        //   onPressed: () {
+        //     // Navigator.push(
+        //     //     context,
+        //     //     MaterialPageRoute(builder: (context) => Addpage(data: widget.data,)),
+        //     // );
+        //   },
+        //   child: Icon(
+        //     Icons.add,
+        //     color:Colors.white,
+        //   ),
+       // ),
+        //floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: AnimatedBottomNavigationBar(
           activeColor:  AppColors.contColor5,
           iconSize: 25,

@@ -146,10 +146,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               ElevatedButton(
                 onPressed: () async {
                  if(_key.currentState!.validate()){
+                   final selectedType = (_servicetype != null && _servicetype!.isNotEmpty)
+                       ? _servicetype!
+                       : typeController.text;
                    Service newService = Service(
                      title: titleController.text,
                      description: descriptionController.text,
-                     type: typeController.text,
+                     type: selectedType,
                      price: double.parse(priceController.text),
                      offer: int.parse(offerController.text),
                      status: 1,

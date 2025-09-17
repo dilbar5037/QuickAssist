@@ -44,6 +44,7 @@ class _HomepageState extends State<Homepage> {
   String?email;
   String?phone;
   String?img;
+  String? profileLocation;
 
 
   getData() async {
@@ -54,6 +55,7 @@ class _HomepageState extends State<Homepage> {
     phone = await _pref.getString('phone');
     uid = await _pref.getString('uid');
     img = await _pref.getString('imgurl');
+    profileLocation = await _pref.getString('location');
 
     setState(() {});
   }
@@ -74,9 +76,12 @@ class _HomepageState extends State<Homepage> {
 
     return Consumer<LocationProvider>(
         builder: (context, locationProvider, child){
-          if (locationProvider.currentLocationName != null) {
+          if (profileLocation != null &&
+              profileLocation!.trim().isNotEmpty &&
+              profileLocation!.toLowerCase() != 'location') {
+            locationCity = profileLocation;
+          } else if (locationProvider.currentLocationName != null) {
             locationCity = locationProvider.currentLocationName!.locality;
-            print(locationCity);
           } else {
             locationCity = "Unknown Location";
           }
@@ -97,9 +102,12 @@ class _HomepageState extends State<Homepage> {
                           child: Consumer<LocationProvider>(
                               builder: (context, locationProvider, child) {
 
-                                if (locationProvider.currentLocationName != null) {
+                                if (profileLocation != null &&
+                                    profileLocation!.trim().isNotEmpty &&
+                                    profileLocation!.toLowerCase() != 'location') {
+                                  locationCity = profileLocation;
+                                } else if (locationProvider.currentLocationName != null) {
                                   locationCity = locationProvider.currentLocationName!.locality;
-                                  print(locationCity);
                                 } else {
                                   locationCity = "Unknown Location";
                                 }
