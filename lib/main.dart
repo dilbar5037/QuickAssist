@@ -1,5 +1,3 @@
-
-
 /*
  * QuickAssist - Vehicle Service Booking App
  * 
@@ -90,14 +88,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => LocationProvider())
       ],
-      child: MaterialApp(
-        title: 'Quick Assist',
-        theme: ThemeData(
-
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            appBarTheme: AppBarTheme(
-                color: AppColors.scaffoldColor,
-                iconTheme: IconThemeData(color: Colors.white)
+      
             ),
             useMaterial3: true,
             textTheme: TextTheme(

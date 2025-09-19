@@ -15,6 +15,7 @@ import 'package:quickassitnew/user/service_by_type.dart';
 import 'package:quickassitnew/widgets/appbutton.dart';
 
 import 'package:quickassitnew/user/servicetype_list_page.dart';
+import 'package:quickassitnew/user/mybookings.dart';
 
 import 'package:quickassitnew/widgets/apptext.dart';
 import 'package:quickassitnew/widgets/customcontainer.dart';
@@ -326,6 +327,17 @@ class _HomepageState extends State<Homepage> {
               title: "Select Service Type",
               items: otherserviceType,
             ),
+            const SizedBox(height: 16),
+            _FeedbackPromptCard(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyBookings(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(
               height: 32,
             ),
@@ -431,6 +443,76 @@ class _HomepageState extends State<Homepage> {
 
     // Now you can use 'selectedDateTime' for further processing
     print('Selected Date and Time: $selectedDateTime');
+  }
+}
+
+class _FeedbackPromptCard extends StatelessWidget {
+  const _FeedbackPromptCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.contColor5,
+              AppColors.btnPrimaryColor,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 26,
+              backgroundColor: Colors.white.withOpacity(0.18),
+              child: const Icon(
+                Icons.star_rounded,
+                size: 30,
+                color: Colors.amber,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Share your feedback',
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Rate your recent services to help us improve recommendations.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 18,
+              color: Colors.white70,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

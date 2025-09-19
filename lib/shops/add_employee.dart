@@ -31,15 +31,18 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
 
   final EmployeeService _employeeService = EmployeeService();
 
-   String? _servicetype="";
-   final _key=GlobalKey<FormState>();
+  String? _servicetype = "";
+  final _key = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
-        title: AppText(data:'Add Employee',color: Colors.white,size: 16,),
+        title: AppText(
+          data: 'Add Employee',
+          color: Colors.white,
+          size: 16,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -51,8 +54,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
               children: [
                 Text('Name'),
                 TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "Name is Mandatory";
                       }
                     },
@@ -60,8 +63,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 SizedBox(height: 16.0),
                 Text('Location'),
                 TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "Location is Mandatory";
                       }
                     },
@@ -69,8 +72,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 SizedBox(height: 16.0),
                 Text('Address'),
                 TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "Location is Mandatory";
                       }
                     },
@@ -78,16 +81,13 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 SizedBox(height: 16.0),
                 Text('Email'),
                 TextFormField(
-                    validator: (value){
+                    validator: (value) {
                       var pattern =
                           r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
                       RegExp regex = new RegExp(pattern);
-                      if (!regex.hasMatch(value!))
-                      {
+                      if (!regex.hasMatch(value!)) {
                         return 'Email format is invalid';
-                      }
-                      else
-                      {
+                      } else {
                         return null;
                       }
                     },
@@ -95,45 +95,48 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 SizedBox(height: 16.0),
                 Text('Password'),
                 TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "Password is Mandatory";
                       }
                     },
                     controller: passwordController),
                 SizedBox(height: 16.0),
-
-
                 DropdownMenu(
                     hintText: "Select Service Type",
                     width: 275,
-
                     controller: jobTypeController,
                     enableSearch: true,
-
                     enableFilter: true,
                     requestFocusOnTap: true,
-                    onSelected: (String ?country){
-                      if(country!=null){
+                    onSelected: (String? country) {
+                      if (country != null) {
                         setState(() {
-                          _servicetype=country;
+                          _servicetype = country;
                         });
                       }
                     },
-                    dropdownMenuEntries: ["Cars","Motor Bikes","Heavy Vehicles","Towing","Washing","Accident","Fuel"]
+                    dropdownMenuEntries: [
+                      "Cars",
+                      "Motor Bikes",
+                      "Heavy Vehicles",
+                      "Towing",
+                      "Washing",
+                      "Accident",
+                      "Fuel"
+                    ]
                         .map((country) =>
-                        DropdownMenuEntry(value: country, label: country))
+                            DropdownMenuEntry(value: country, label: country))
                         .toList()),
-
                 SizedBox(height: 16.0),
                 Text('Adhar Number'),
                 TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "Adhar No is Mandatory";
                       }
 
-                      if(value.length<12){
+                      if (value.length < 12) {
                         return "Enter a valid AdharID";
                       }
                     },
@@ -141,34 +144,33 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 SizedBox(height: 16.0),
                 Text('Phone'),
                 TextFormField(
-
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "Phone is Mandatory";
                       }
 
-                      if (value!.length<10) {
+                      if (value!.length < 10) {
                         return 'Mobile Number is invalid';
                       }
-                    },controller: phoneController),
+                    },
+                    controller: phoneController),
                 SizedBox(height: 16.0),
                 Text('Account Info'),
                 TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return "A/c No is Mandatory";
                       }
                     },
                     controller: accountInfoController),
                 SizedBox(height: 16.0),
-
                 ElevatedButton(
-                  onPressed: () {
-                   if(_key.currentState!.validate()){
-                     _addEmployee();
-                   }
+                  onPressed: () async {
+                    if (_key.currentState!.validate()) {
+                      await _addEmployee();
+                    }
                   },
-                  child: Text('Add Employee'),
+                  child: const Text('Add Employee'),
                 ),
               ],
             ),
@@ -178,8 +180,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     );
   }
 
-  void _addEmployee() {
-    Employee newEmployee = Employee(
+  Future<void> _addEmployee() async {
+    final newEmployee = Employee(
       name: nameController.text,
       shopId: widget.shopId,
       location: locationController.text,
@@ -193,45 +195,74 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       //img: imgController.text,
     );
 
-    _employeeService.addEmployee(newEmployee);
+    await _employeeService.addEmployee(newEmployee);
 
-    openWhatsapp(
-        context: context,
-        text:
-        "Hi Greetings From DriveX\n Your Login credentials\n username:${newEmployee.email} \nPassword:${newEmployee.password}",
-        number: "+91${newEmployee.phone}");
+    await _openWhatsapp(
+      context: context,
+      text:
+          'Hi Greetings From DriveX\nYour login credentials\nUsername: ${newEmployee.email}\nPassword: ${newEmployee.password}',
+      number: '+91${newEmployee.phone}',
+    );
 
-
-    // You might want to navigate back or show a success message
+    if (!mounted) return;
     Navigator.pop(context);
   }
 
-  void openWhatsapp(
-      {required BuildContext context,
-        required String text,
-        required String number}) async {
-    var whatsapp = number; //+92xx enter like this
-    var whatsappURlAndroid =
-        "whatsapp://send?phone=" + whatsapp + "&text=$text";
-    var whatsappURLIos = "https://wa.me/$whatsapp?text=${Uri.tryParse(text)}";
-    if (Platform.isIOS) {
-      // for iOS phone only
-      if (await canLaunchUrl(Uri.parse(whatsappURLIos))) {
-        await launchUrl(Uri.parse(
-          whatsappURLIos,
-        ));
+  Future<void> _openWhatsapp({
+    required BuildContext context,
+    required String text,
+    required String number,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final sanitizedNumber = number.replaceAll(RegExp(r'[^0-9+]'), '');
+    final webNumber = sanitizedNumber.startsWith('+')
+        ? sanitizedNumber.substring(1)
+        : sanitizedNumber;
+    final encodedText = Uri.encodeComponent(text);
+
+    final androidUri =
+        Uri.parse('whatsapp://send?phone=$sanitizedNumber&text=$encodedText');
+    final universalUri =
+        Uri.parse('https://wa.me/$webNumber?text=$encodedText');
+
+    Future<void> showNotAvailable() async {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('WhatsApp not available')),
+      );
+    }
+
+    Future<bool> launchExternal(Uri uri) async {
+      return launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    }
+
+    try {
+      if (Platform.isAndroid) {
+        if (await canLaunchUrl(androidUri) &&
+            await launchExternal(androidUri)) {
+          return;
+        }
+        if (await canLaunchUrl(universalUri) &&
+            await launchExternal(universalUri)) {
+          return;
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Whatsapp not installed")));
+        if (await canLaunchUrl(universalUri) &&
+            await launchExternal(universalUri)) {
+          return;
+        }
+        if (await canLaunchUrl(androidUri) &&
+            await launchExternal(androidUri)) {
+          return;
+        }
       }
-    } else {
-      // android , web
-      if (await canLaunchUrl(Uri.parse(whatsappURlAndroid))) {
-        await launchUrl(Uri.parse(whatsappURlAndroid));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Whatsapp not installed")));
-      }
+      await showNotAvailable();
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('Unable to open WhatsApp: $e')),
+      );
     }
   }
 }

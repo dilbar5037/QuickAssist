@@ -7,6 +7,7 @@ import 'package:quickassitnew/shops/add_ofers.dart';
 import 'package:quickassitnew/shops/add_service.dart';
 import 'package:quickassitnew/shops/asignedwork_all.dart';
 import 'package:quickassitnew/shops/shopBooking.dart';
+import 'package:quickassitnew/shops/shop_feedback_page.dart';
 import 'package:quickassitnew/shops/view_all_employees.dart';
 import 'package:quickassitnew/shops/view_all_services.dart';
 import 'package:quickassitnew/shops/view_oofers.dart';
@@ -70,34 +71,43 @@ class _ShopHomePageState extends State<ShopHomePage> {
               children: [
                 CircleAvatar(
                   child: AppText(
-                    data: "${name![0]}",
+                    data: (name != null && name!.isNotEmpty) ? name![0] : '?',
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 AppText(
-                  data: "$name",
+                  data: name ?? '',
                   color: Colors.white,
                 )
               ],
             )),
             ListTile(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>Settingpage()));
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Settingpage()));
               },
-              title: AppText(data: "Setting",color: Colors.white,),
+              title: AppText(
+                data: "Setting",
+                color: Colors.white,
+              ),
             ),
             ListTile(
-              onTap: () async{
-                SharedPreferences _pref =
-                    await SharedPreferences.getInstance();
+              onTap: () async {
+                SharedPreferences _pref = await SharedPreferences.getInstance();
                 FirebaseAuth.instance.signOut().then((value) {
                   _pref.clear();
-                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>LoginPage()), (route) => false);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      (route) => false);
                 });
               },
-              title: AppText(data: "Logout",color: Colors.white,),
+              title: AppText(
+                data: "Logout",
+                color: Colors.white,
+              ),
             )
           ],
         ),
@@ -109,81 +119,112 @@ class _ShopHomePageState extends State<ShopHomePage> {
         ),
       ),
       body: Container(
-        
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            
-            DashboardItemWidget(onTap1: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddOfferScreen(),
-                ),
-              );
-            }, onTap2: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OfferListScreen(),
-                ),
-              );
-            }, titleOne: "Add Offer", titleTwo: "ViewAll Offers"),
-
-
+            DashboardItemWidget(
+                onTap1: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddOfferScreen(),
+                    ),
+                  );
+                },
+                onTap2: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OfferListScreen(),
+                    ),
+                  );
+                },
+                titleOne: "Add Offer",
+                titleTwo: "ViewAll Offers"),
             MyDivider(),
-
-            DashboardItemWidget(onTap1: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddServiceScreen(),
-                ),
-              );
-            }, onTap2: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ServiceListScreen(uid: uid,),
-                ),
-              );
-            }, titleOne: "Add Service", titleTwo: "ViewAll Services"),
-
+            DashboardItemWidget(
+                onTap1: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddServiceScreen(),
+                    ),
+                  );
+                },
+                onTap2: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ServiceListScreen(
+                        uid: uid,
+                      ),
+                    ),
+                  );
+                },
+                titleOne: "Add Service",
+                titleTwo: "ViewAll Services"),
             MyDivider(),
-            DashboardItemWidget(onTap1: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ShopBookings(uid:uid),
-                ),
-              );
-            }, onTap2: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AssignedWorkPage(),
-                ),
-              );
-            }, titleOne: "All Bookings", titleTwo: "Assigned Work"),
-
-
-
+            DashboardItemWidget(
+                onTap1: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShopBookings(uid: uid),
+                    ),
+                  );
+                },
+                onTap2: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AssignedWorkPage(),
+                    ),
+                  );
+                },
+                titleOne: "All Bookings",
+                titleTwo: "Assigned Work"),
             MyDivider(),
-            DashboardItemWidget(onTap1: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddEmployeeScreen(shopId: uid!),
-                ),
-              );
-            }, onTap2: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EmployeeListScreen(shopId: uid,),
-                ),
-              );
-            }, titleOne: "Add Employee", titleTwo: "ViewAll Employee")
+            DashboardItemWidget(
+                onTap1: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddEmployeeScreen(shopId: uid!),
+                    ),
+                  );
+                },
+                onTap2: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EmployeeListScreen(
+                        shopId: uid,
+                      ),
+                    ),
+                  );
+                },
+                titleOne: "Add Employee",
+                titleTwo: "ViewAll Employee"),
+            MyDivider(),
+            DashboardItemWidget(
+                onTap1: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ShopFeedbackPage(),
+                    ),
+                  );
+                },
+                onTap2: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ShopFeedbackPage(),
+                    ),
+                  );
+                },
+                titleOne: "View Feedback",
+                titleTwo: "Ratings"),
           ],
         ),
       ),

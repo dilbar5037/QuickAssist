@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,14 +39,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
   double estimatedTax = 0.0;
   double subtotal = 0.0;
   double total = 0.0;
-  late Razorpay _razorpay = Razorpay();
+  late final Razorpay _razorpay;
   YourInvoiceGenerator invoiceGenerator = YourInvoiceGenerator();
 
   String? _uid;
   getData() async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
-
-
 
     // if (imggurl == null) {
     //   setState(() {
@@ -58,24 +56,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
       'uid',
     );
 
-
-
-    setState(() {
-
-
-    });
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-
-
-  void handlePaymentErrorResponse(PaymentFailureResponse response){
-
+  void handlePaymentErrorResponse(PaymentFailureResponse response) {
     /** PaymentFailureResponse contains three values:
      * 1. Error Code
      * 2. Error Description
      * 3. Metadata
      **/
-    showAlertDialog(context, "Payment Failed", "Code: ${response.code}\nDescription: ${response.message}\nMetadata:${response.error.toString()}");
+    showAlertDialog(context, "Payment Failed",
+        "Code: ${response.code}\nDescription: ${response.message}\nMetadata:${response.error.toString()}");
   }
 
   void handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
@@ -93,7 +86,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
-  Future<void> collectFee(UserModel? user, dynamic booking, String? paymentId) async {
+  Future<void> collectFee(
+      UserModel? user, dynamic booking, String? paymentId) async {
     if (user == null) {
       throw StateError('User details missing for fee collection');
     }
@@ -117,7 +111,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     final paymentDocumentId = Uuid().v1();
 
-    await FirebaseFirestore.instance.collection('payment').doc(paymentDocumentId).set({
+    await FirebaseFirestore.instance
+        .collection('payment')
+        .doc(paymentDocumentId)
+        .set({
       'userId': user.uid,
       'username': user.name,
       'useremail': user.email,
@@ -130,7 +127,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
       'paymentDocId': paymentDocumentId,
     });
 
-    await FirebaseFirestore.instance.collection('bookings').doc(bookingId).update({
+    await FirebaseFirestore.instance
+        .collection('bookings')
+        .doc(bookingId)
+        .update({
       'paymentstatus': 1,
       'status': 'Completed',
     });
@@ -148,22 +148,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   // randomnumber
 
-
-
-  void handleExternalWalletSelected(ExternalWalletResponse response){
-    showAlertDialog(context, "External Wallet Selected", "${response.walletName}");
-  }
-  @override
-  void dispose() {
-    _razorpay.clear(); // Removes all listeners
-    super.dispose();
+  void handleExternalWalletSelected(ExternalWalletResponse response) {
+    showAlertDialog(
+        context, "External Wallet Selected", "${response.walletName}");
   }
 
-  void showAlertDialog(BuildContext context, String title, String message){
+  void showAlertDialog(BuildContext context, String title, String message) {
     // set up the buttons
     Widget continueButton = ElevatedButton(
       child: const Text("Continue"),
-      onPressed:  () {},
+      onPressed: () {},
     );
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
@@ -179,37 +173,77 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  Map<String, dynamic> generateRazorpayOptions() {
+  Map<String, Object?> _buildPaymentOptions() {
+    final amountInPaise = (total * 100).round().clamp(0, 999999999);
+    final contact =
+        (widget.customerData?.phone ?? '').replaceAll(RegExp(r'[^0-9+]'), '');
+    final email = widget.customerData?.email ?? '';
+    final description =
+        widget.booking['offerTitle']?.toString() ?? 'Service payment';
+
+    final prefill = <String, String>{};
+    if (contact.isNotEmpty) {
+      prefill['contact'] = contact;
+    }
+    if (email.isNotEmpty) {
+      prefill['email'] = email;
+    }
+
     return {
       'key': 'rzp_test_7ERJiy5eonusNC',
-      'amount': (total * 100).toInt(), // Convert total to integer (paise)
-      'name': 'QuickAssit',
-      'description': 'kkkk',
-      'prefill': {
-        'contact': '9895663498',
-        'email': 'support@quickassist.com'
-      }
+      'amount': amountInPaise,
+      'name': 'Quick Assist',
+      'description': description,
+      'prefill': prefill,
     };
   }
+
   @override
   void initState() {
-    getData();
-    calculateTotalValues();
-
+    super.initState();
+    _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
-    super.initState();
+    getData();
+    calculateTotalValues();
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
   }
 
   void calculateTotalValues() {
     // Adjust the tax rate based on your requirements
 
-
     // Calculate the subtotal, estimated tax, and total
-    subtotal = double.parse(widget.booking['offerPrice']);
-   // estimatedTax = subtotal;
-    total = subtotal ;
+    final rawPrice = widget.booking['offerPrice'];
+    if (rawPrice != null) {
+      subtotal = double.tryParse(rawPrice.toString()) ?? 0.0;
+    } else {
+      subtotal = 0.0;
+    }
+    total = subtotal;
+  }
+
+  void _startPayment() {
+    final amountPaise = (total * 100).round();
+    if (amountPaise <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Payment amount must be greater than zero.')),
+      );
+      return;
+    }
+    try {
+      _razorpay.open(_buildPaymentOptions());
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to launch Razorpay: $e')),
+      );
+    }
   }
 
   @override
@@ -217,7 +251,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: AppBar(
-        title: Text('Checkout',style: TextStyle(color: Colors.white),),
+        title: Text(
+          'Checkout',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -226,13 +263,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
           children: [
             Text(
               'Cost Summary',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal,color: Colors.white),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.white),
             ),
             SizedBox(height: 8),
-
             Text(
               '${widget.customerData!.name} - ${widget.customerData!.phone}',
-              style: TextStyle(fontSize: 16,color: Colors.white),
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
             SizedBox(height: 30),
             Row(
@@ -240,13 +279,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 Text(
                   'Subtotal: ₹${widget.booking['offerPrice']}',
-                   textAlign: TextAlign.right,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ],
             ),
             Divider(
-              thickness: 1.5, color: Colors.teal,
+              thickness: 1.5,
+              color: Colors.teal,
             ),
             SizedBox(height: 8),
             Row(
@@ -254,12 +297,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 Text(
                   'Estimated Tax (18%): ₹${estimatedTax.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 16,color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ],
             ),
             Divider(
-              thickness: 1.5, color: Colors.teal,
+              thickness: 1.5,
+              color: Colors.teal,
             ),
             SizedBox(height: 8),
             Row(
@@ -267,29 +311,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 Text(
                   'Total: ₹${total.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ],
             ),
             Divider(
-              thickness: 1.5, color: Colors.teal,
+              thickness: 1.5,
+              color: Colors.teal,
             ),
             SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () {
-                try{
-                  _razorpay.open(generateRazorpayOptions());
-                }catch(e){
-                  print(e);
-                }
-                // Implement your payment logic here
-                // You may want to use a payment gateway or navigate to a payment screen
-                // For simplicity, let's print a message for now
-                print('Payment successful.');
-                // You can also call the joinCourse method here if payment is successful
-                // courseService.joinCourse(course.id, userId, booking);
-              },
-              child: Text('Pay Now'),
+              onPressed: _startPayment,
+              child: const Text('Pay Now'),
             ),
           ],
         ),
@@ -297,5 +333,3 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 }
-
-
