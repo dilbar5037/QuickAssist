@@ -1,0 +1,14 @@
+class RazorpayConfig {
+  // Razorpay API Keys - Replace with your actual keys
+  static const String keyId = 'YOUR_RAZORPAY_KEY_ID_HERE';
+  static const String keySecret = 'YOUR_RAZORPAY_KEY_SECRET_HERE';
+  
+  // App Configuration
+  static const String appName = 'Quick Assist';
+  static const String currency = 'INR';
+  
+  // Payment Configuration
+  static const int minAmount = 100; // Minimum amount in paise
+  static const int maxAmount = 999999999; // Maximum amount in paise
+}
+

@@ -26,7 +26,6 @@ import 'package:quickassitnew/services/location_provider.dart';
 import 'package:quickassitnew/admin/addons_backfill_normalize.dart';
 
 void main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
@@ -49,8 +48,7 @@ void main() async {
     // Fire-and-forget normalization so startup is never blocked by network
     () async {
       try {
-        await BackfillNormalizer
-            .normalizeServices()
+        await BackfillNormalizer.normalizeServices()
             .timeout(const Duration(seconds: 5));
         print('Backfill normalization completed');
       } catch (e) {
@@ -88,14 +86,20 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => LocationProvider())
       ],
-      
-            ),
-            useMaterial3: true,
-            textTheme: TextTheme(
-                displayLarge: TextStyle(fontSize:22 ,color: Colors.white),
-                displayMedium: TextStyle(fontSize: 18,color: Colors.white),
-                displaySmall: TextStyle(fontSize: 16,color: Colors.white)
-            )
+      child: MaterialApp(
+        title: 'Quick Assist',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          appBarTheme: AppBarTheme(
+            color: AppColors.scaffoldColor,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          useMaterial3: true,
+          textTheme: const TextTheme(
+            displayLarge: TextStyle(fontSize: 22, color: Colors.white),
+            displayMedium: TextStyle(fontSize: 18, color: Colors.white),
+            displaySmall: TextStyle(fontSize: 16, color: Colors.white),
+          ),
         ),
         debugShowCheckedModeBanner: false,
         home: Splashpage(),
@@ -103,4 +107,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

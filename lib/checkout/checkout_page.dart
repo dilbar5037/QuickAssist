@@ -13,6 +13,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'package:quickassitnew/checkout/invocie_number_generator.dart';
+import 'package:quickassitnew/config/razorpay_config.dart';
 import 'package:quickassitnew/constans/colors.dart';
 import 'package:quickassitnew/mechanic/mechanic_home_page.dart';
 import 'package:quickassitnew/models/booking_model.dart';
@@ -174,7 +175,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Map<String, Object?> _buildPaymentOptions() {
-    final amountInPaise = (total * 100).round().clamp(0, 999999999);
+    final amountInPaise = (total * 100).round();
+    final sanitizedAmount = amountInPaise.clamp(RazorpayConfig.minAmount, RazorpayConfig.maxAmount);
     final contact =
         (widget.customerData?.phone ?? '').replaceAll(RegExp(r'[^0-9+]'), '');
     final email = widget.customerData?.email ?? '';
@@ -189,13 +191,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
       prefill['email'] = email;
     }
 
-    return {
-      'key': 'rzp_test_7ERJiy5eonusNC',
-      'amount': amountInPaise,
-      'name': 'Quick Assist',
+    final options = {
+      'key': RazorpayConfig.keyId,
+      'amount': sanitizedAmount,
+      'currency': RazorpayConfig.currency,
+      'name': RazorpayConfig.appName,
       'description': description,
-      'prefill': prefill,
+      'retry': {'enabled': true, 'max_count': 1},
     };
+    if (prefill.isNotEmpty) {
+      options['prefill'] = prefill;
+    }
+    return options;
   }
 
   @override
@@ -216,21 +223,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void calculateTotalValues() {
-    // Adjust the tax rate based on your requirements
-
-    // Calculate the subtotal, estimated tax, and total
     final rawPrice = widget.booking['offerPrice'];
     if (rawPrice != null) {
-      subtotal = double.tryParse(rawPrice.toString()) ?? 0.0;
+      final sanitized = rawPrice.toString().replaceAll(RegExp(r'[^0-9.]'), '');
+      subtotal = double.tryParse(sanitized) ?? 0.0;
     } else {
       subtotal = 0.0;
+    }
+    if (subtotal <= 0) {
+      subtotal = 0.0;
+      total = 0.0;
+      return;
     }
     total = subtotal;
   }
 
   void _startPayment() {
-    final amountPaise = (total * 100).round();
-    if (amountPaise <= 0) {
+    final options = _buildPaymentOptions();
+    final amount = options['amount'] as int? ?? 0;
+    if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Payment amount must be greater than zero.')),
@@ -238,7 +249,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return;
     }
     try {
-      _razorpay.open(_buildPaymentOptions());
+      _razorpay.open(options);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unable to launch Razorpay: $e')),
